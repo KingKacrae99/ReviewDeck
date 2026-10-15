@@ -1,56 +1,173 @@
-﻿@inherits LayoutComponentBase
+﻿
+@inherits LayoutComponentBase
 
 <div class="page">
     <header class="site-header">
-        <a href="/" class="logo">
+        <a href="/" class="logo" aria-label="ReviewDeck home">
             <img src="/image/ReviewDeck_logo.png"
-                alt="ReviewDeck"
-                loading="lazy" />
+                 alt="ReviewDeck"
+                 width="72"
+                 height="72" />
+            <span class="logo-text">ReviewDeck</span>
         </a>
 
-        <nav class="main-nav">
+        <nav class="main-nav" aria-label="Main navigation">
             <ul>
-                <li class="active"><a href="/">Home</a></li>
-                <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="/record">Record</a></li>
-                <li><a href="/about">About</a></li>
+                <li>
+                    <a class="navLinks" href="/">Dashboard</a>
+                </li>
+                <li>
+                    <a class="navLinks" href="/Application">Jobs Application</a>
+                </li>
+                <li>
+                    <a class="navLinks" href="/Application/Add">create application</a>
+                </li>
             </ul>
-            <button class="hamburger" aria-label="Open navigation menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
         </nav>
 
         <div class="auth-links">
-            <a href="/register">Sign up</a>
-            <a href="/login">Login</a>
+            <a href="/login" class="login-link">
+                Log in
+            </a>
+            <a href="/register" class="navLinks">
+                Get started
+            </a>
         </div>
 
-        <div class="small-nav">
+        <button class="hamburger"
+                type="button"
+                aria-label="Toggle navigation menu"
+                aria-expanded="@isMenuOpen"
+                aria-controls="mobile-navigation"
+                @onclick="ToggleMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav id="mobile-navigation"
+             class="small-nav @(isMenuOpen ? "open" : "")"
+             aria-label="Mobile navigation"
+             aria-hidden="@(!isMenuOpen)">
+
             <ul>
-                <li class="active"><a href="/">Home</a></li>
-                <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="/record">Record</a></li>
-                <li><a href="/about">About</a></li>
-                <li><a href="/register">Sign Up</a></li>
-                <li><a href="/login">Login</a></li>
+                <li>
+                    <NavLink href="/"
+                             Match="NavLinkMatch.All"
+                             @onclick="CloseMenu">
+                        Home
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink href="/dashboard"
+                             @onclick="CloseMenu">
+                        Dashboard
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink href="/record"
+                             @onclick="CloseMenu">
+                        Records
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink href="/about"
+                             @onclick="CloseMenu">
+                        About
+                    </NavLink>
+                </li>
+                <li class="mobile-auth">
+                    <NavLink href="/login"
+                             @onclick="CloseMenu">
+                        Log in
+                    </NavLink>
+                </li>
+                <li class="mobile-auth">
+                    <NavLink href="/register"
+                             @onclick="CloseMenu">
+                        Get started
+                    </NavLink>
+                </li>
             </ul>
-        </div>
+        </nav>
     </header>
 
-
-    <main>
+    <main class="site-main">
         <article class="content">
             @Body
         </article>
     </main>
+
+    <footer class="site-footer">
+        <div class="footer-main">
+            <div class="footer-brand">
+                <a href="/" class="footer-logo">
+                    <img src="/image/ReviewDeck_logo.png"
+                         alt=""
+                         width="48"
+                         height="48" />
+                    <span>ReviewDeck</span>
+                </a>
+
+                <p>
+                    Keep your job search organized.
+                    Track applications, manage opportunities,
+                    and take the next step in your career.
+                </p>
+            </div>
+
+            <div class="footer-column">
+                <h2>Explore</h2>
+                <ul>
+                    <li><NavLink href="/">Home</NavLink></li>
+                    <li><NavLink href="/dashboard">Dashboard</NavLink></li>
+                    <li><NavLink href="/record">Records</NavLink></li>
+                    <li><NavLink href="/about">About us</NavLink></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h2>Your account</h2>
+                <ul>
+                    <li><NavLink href="/login">Log in</NavLink></li>
+                    <li><NavLink href="/register">Create account</NavLink></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>
+                &copy; @DateTime.Now.Year ReviewDeck.
+                All rights reserved.
+            </p>
+
+            <p class="footer-tagline">
+                Built for your next opportunity.
+            </p>
+        </div>
+    </footer>
 </div>
 
 <div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
+    An unexpected error occurred.
     <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
+    <button type="button"
+            class="dismiss"
+            aria-label="Dismiss error message">
+        &times;
+    </button>
 </div>
 
+@code {
+    private bool isMenuOpen;
 
+    private void ToggleMenu()
+    {
+        isMenuOpen = !isMenuOpen;
+    }
+
+    private void CloseMenu()
+    {
+        isMenuOpen = false;
+    }
+}
