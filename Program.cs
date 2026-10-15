@@ -6,6 +6,8 @@ using ReviewDeck.Models;
 using ReviewDeck.Data;
 using ReviewDeck.Services;
 using ReviewDeck.Routes;
+using Microsoft.AspNetCore.DataProtection;
+using System.IO;
 
 
 
@@ -52,6 +54,15 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorization();
 
+var keyDirectory = Path.Combine(
+    builder.Environment.ContentRootPath,
+    "DataProtection-Keys"
+);
+
+builder.Services
+    .AddDataProtection()
+    .PersistKeysToDbContext<ReviewDeckContext>()
+    .SetApplicationName("ReviewDeck");
 
 var app = builder.Build();
 

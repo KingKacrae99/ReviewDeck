@@ -2,17 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ReviewDeck.Models;
 
+
 namespace ReviewDeck.Data
 {
-    public class ReviewDeckContext : DbContext
+    public class ReviewDeckContext : DbContext, IDataProtectionKeyContext
     {
         public ReviewDeckContext (DbContextOptions<ReviewDeckContext> options)
             : base(options)
         {
         }
+        public DbSet<DataProtectionKey> DataProtectionKeys
+        { get; set; } = null!;
 
         public DbSet<User> Users { get; set; } = default!;
         public DbSet<JobApplication> JobApplications { get; set; } = default!;
