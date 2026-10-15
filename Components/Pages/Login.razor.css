@@ -1,0 +1,234 @@
+.login-container {
+    width: 100%;
+    min-height: 100vh;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary);
+    box-sizing: border-box;
+}
+
+.login-card {
+    padding: 1rem;
+    width: 60%;
+    max-width: 600px;
+    margin: auto;
+    box-sizing: border-box;
+}
+
+.login-card .login-header {
+    margin: 0 auto 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: var(--accent2);
+}
+
+.login-card .login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.login-card .login-form .form-group {
+    width: 80%;
+    margin: 0 auto 1.25rem;
+    color: var(--accent2);
+    box-sizing: border-box;
+}
+
+.login-card .login-form .form-group .form-control {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-card .login-form .btn-primary {
+    display: block;
+    width: 80%;
+    margin: 0 auto;
+    background-color: var(--secondary);
+    box-sizing: border-box;
+}
+/* Validation messages */
+.login-form .validation-message {
+    display: block;
+    margin-top: 0.25rem;
+}
+
+/* Register link */
+.other-methods {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.other-methods p {
+    color: var(--accent2);
+}
+
+.other-methods p a {
+    text-decoration: none;
+}
+
+.other-methods {
+    width: 100%;
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.register-prompt p {
+    color: var(--accent2);
+}
+
+.register-link {
+    color: var(--accent2);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.register-link:hover {
+    text-decoration: underline;
+}
+
+.social-login {
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    color: var(--accent2);
+    font-size: 0.85rem;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: var(--accent2);
+    opacity: 0.35;
+}
+
+/* Arrange the social options horizontally */
+.social-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+/* Each option contains an icon and a name */
+.social-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    min-width: 60px;
+}
+
+.social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    background-color: #fff;
+    font-size: 1.4rem;
+    transition: transform 0.2s ease,
+                background-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.social-icon svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+/* Brand colors */
+.google-btn {
+    color: #4285F4;
+}
+
+.linkedin-btn {
+    color: #0A66C2;
+}
+
+.indeed-btn {
+    color: #2164F3;
+}
+
+/* Provider name underneath the icon */
+.social-name {
+    color: var(--accent2);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Hover effect */
+.social-option:hover .social-icon {
+    transform: translateY(-3px);
+    background-color: #f8fafc;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.social-option:focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 4px;
+    border-radius: 8px;
+}
+
+.login-error {
+    width: 80%;
+    margin-bottom: 0.5rem;
+    color: #dc3545;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.login-error:empty {
+    display: none;
+}
+
+@media (max-width: 640.89px) {
+    .login-card{
+        width: 100%;
+        margin: 0px;
+    }
+    .login-card .login-form .form-group,
+    .login-card .login-form .btn-primary {
+        width: 100%;
+    }
+
+    .login-error {
+        width: 100%;
+    }
+
+    .social-buttons {
+        gap: 1.25rem;
+    }
+
+    .social-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1.25rem;
+    }
+}

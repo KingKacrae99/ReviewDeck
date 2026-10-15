@@ -1,0 +1,192 @@
+
+@page "/Applications/Add"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using ReviewDeck.Models
+@using ReviewDeck.Services
+
+@attribute [Authorize]
+
+@inject IJobApplicationService JobApplicationService
+@inject NavigationManager Navigation
+
+<PageTitle>Add Application | ReviewDeck</PageTitle>
+
+<div class="container py-4">
+    <div class="mb-4">
+        <a href="/Applications" class="back-btn text-decoration-none">
+            &larr; Back to applications
+        </a>
+
+        <h1 class="mt-3">Add Job Application</h1>
+        <p class="text-muted">
+            Keep track of a job opportunity you're pursuing.
+        </p>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @errorMessage
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <EditForm Model="@job" OnValidSubmit="@HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="jobTitle" class="form-label">
+                            Job Title *
+                        </label>
+                        <InputText id="jobTitle" class="form-control" @bind-Value="job.JobTitle" placeholder="e.g. Software Developer" />
+                        <ValidationMessage For="@(() => job.JobTitle)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="company" class="form-label">
+                            Company *
+                        </label>
+                        <InputText id="company" class="form-control" @bind-Value="job.Company" placeholder="e.g. Acme Technologies" />
+                        <ValidationMessage For="@(() => job.Company)" />
+                    </div>
+                    <div class="col-12">
+                        <label for="jobUrl" class="form-label">
+                            Job URL *
+                        </label>
+                        <InputText id="jobUrl" class="form-control" @bind-Value="job.JobUrl" placeholder="https://example.com/jobs/123" />
+                        <ValidationMessage For="@(() => job.JobUrl)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="location" class="form-label">
+                            Location
+                        </label>
+                        <InputText id="location" class="form-control" @bind-Value="job.Location" placeholder="e.g. Abuja, Nigeria" />
+                        <ValidationMessage For="@(() => job.Location)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="platform" class="form-label">
+                            Application Platform
+                        </label>
+                        <InputText id="platform" class="form-control" @bind-Value="job.Platform" placeholder="e.g. LinkedIn" />
+                        <ValidationMessage For="@(() => job.Platform)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="jobType" class="form-label">
+                            Employment Type
+                        </label>
+                        <InputSelect id="jobType" class="form-select" @bind-Value="job.JobType">
+                            <option value="Fulltime">Full-time</option>
+                            <option value="Part-Time">Part-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Internship">Internship</option>
+                            <option value="Freelance">Freelance</option>
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="jobMode" class="form-label">
+                            Work Mode
+                        </label>
+                        <InputSelect id="jobMode" class="form-select" @bind-Value="job.JobMode">
+                            <option value="Remote">Remote</option>
+                            <option value="Onsite">Onsite</option>
+                            <option value="Hybrid">Hybrid</option>
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="status" class="form-label">
+                            Application Status
+                        </label>
+
+                        <InputSelect id="status" class="form-select" @bind-Value="job.Status">
+                            <option value="Applied">Applied</option>
+                            <option value="Interview">Interview</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Offered">Offered</option>
+                        </InputSelect>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="appliedAt" class="form-label">
+                            Date Applied *
+                        </label>
+                        <InputDate id="appliedAt" class="form-control" @bind-Value="job.AppliedAt" />
+                    </div>
+                    <div class="col-12">
+                        <label for="description" class="form-label">
+                            Job Description
+                        </label>
+                        <InputTextArea id="description" class="form-control" rows="5"
+                            @bind-Value="job.Description"
+                            placeholder="Add notes or a short description of the role..." />
+                        <ValidationMessage For="@(() => job.Description)" />
+                    </div>
+                </div>
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit"
+                            class="btn btn-primary"
+                            disabled="@isSaving">
+                        @(isSaving ? "Saving..." : "Save Application")
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary"
+                        disabled="@isSaving"
+                        @onclick="Cancel">
+                        Cancel
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private JobApplication job = new()
+    {
+        Status = "Applied",
+        JobType = "Fulltime",
+        JobMode = "Remote",
+        AppliedAt = DateTime.Today
+    };
+
+    private bool isSaving;
+    private string? errorMessage;
+
+    private async Task HandleValidSubmit()
+    {
+        if (isSaving)
+            return;
+
+        isSaving = true;
+        errorMessage = null;
+
+        try
+        {
+            await JobApplicationService.AddJobsAsync(job);
+
+            Navigation.NavigateTo("/Applications");
+        }
+        catch (ArgumentException ex)
+        {
+            errorMessage = ex.Message;
+        }
+        catch (InvalidOperationException ex)
+        {
+            errorMessage = ex.Message;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            errorMessage = "Please log in to add a job application.";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/Applications");
+    }
+}

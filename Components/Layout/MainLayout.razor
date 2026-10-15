@@ -1,0 +1,56 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <header class="site-header">
+        <a href="/" class="logo">
+            <img src="/image/ReviewDeck_logo.png"
+                alt="ReviewDeck"
+                loading="lazy" />
+        </a>
+
+        <nav class="main-nav">
+            <ul>
+                <li class="active"><a href="/">Home</a></li>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/record">Record</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+            <button class="hamburger" aria-label="Open navigation menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+
+        <div class="auth-links">
+            <a href="/register">Sign up</a>
+            <a href="/login">Login</a>
+        </div>
+
+        <div class="small-nav">
+            <ul>
+                <li class="active"><a href="/">Home</a></li>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/record">Record</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/register">Sign Up</a></li>
+                <li><a href="/login">Login</a></li>
+            </ul>
+        </div>
+    </header>
+
+
+    <main>
+        <article class="content">
+            @Body
+        </article>
+    </main>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+

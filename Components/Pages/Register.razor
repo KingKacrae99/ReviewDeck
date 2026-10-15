@@ -1,0 +1,122 @@
+@page "/register";
+
+@using ReviewDeck.Models;
+@using ReviewDeck.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject IUserService UserService
+@inject NavigationManager Navigation
+
+<PageTitle>Registration | ReviewDeck </PageTitle>
+
+<div class="register-container">
+    <div class="register-card">
+        <section class="register-header">
+            <ReviewDeckLogo/>
+            <div class="register-title">
+                <h1> Registration</h1>
+            </div>
+        </section>
+        <section class="signup-content">
+            <div class="signup-text">
+                <h2>Create Your ReviewDeck Account</h2>
+                <p>Register to start managing your job applications.</p>
+            </div>
+            <EditForm Model="registerModel" OnValidSubmit="@RegisterAsync" class="signup-form">
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
+                @if (!string.IsNullOrWhiteSpace(errorMessage))
+                {
+                    <div class="error-message" role="alert">
+                        @errorMessage
+                    </div>
+                }
+                <fieldset class="personal-info">
+                    <legend>Personal Information</legend>
+                    <div class="fullname">
+                        <div class="form-group">
+                            <label for="firstname">First Name</label>
+                            <InputText id="firstname" @bind-Value="@registerModel.Firstname" class="form-control" required/>
+                            <ValidationMessage For="@(()=> registerModel.Firstname)"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastname">First Name</label>
+                            <InputText id="lastname" @bind-Value="@registerModel.Lastname" class="form-control" required/>
+                            <ValidationMessage For="@(()=> registerModel.Lastname)"/>
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="form-group mb-3">
+                    <label for="Email">Email</label>
+                    <InputText id="email" @bind-Value="@registerModel.Email" class="form-control" placeholder="Enter a valid email..." required/>
+                    <ValidationMessage For="@(()=> registerModel.Email)"/>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="Phone">Phone <span>(optional)</span></label>
+                    <InputText id="phone" @bind-Value="@registerModel.Phone" class="form-control" placeholder="Enter a valid phone number"/>
+                    <ValidationMessage For="@(()=> @registerModel.Phone)"/>
+                </div>
+                <fieldset class="auth-key">
+                    <legend>Password</legend>
+                    <small class="text-muted text-sm">
+                        Note: Password must be at least 8 characters
+                    </small>
+                    <div class="passwords">
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <InputText id="password" @bind-Value="@registerModel.Password" class="form-control" required />
+                            <ValidationMessage For="@(()=> registerModel.Password)"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-password">Confirm Password</label>
+                            <InputText id="confirm-password" @bind-Value="@registerModel.ConfirmPassword" class="form-control" required />
+                            <ValidationMessage For="@(()=> registerModel.ConfirmPassword)"/>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <button type="submit" disabled="@isSubmitting" class="btn btn-primary">
+                    @(isSubmitting? "Creating Account...": "Sign Up")
+                </button>
+            </EditForm>
+        </section>
+    </div>
+</div>
+@code{
+    private UserRegisterModel registerModel =  new();
+    private string? errorMessage;
+    private bool isSubmitting;
+
+    private async Task RegisterAsync()
+    {
+        if (isSubmitting)
+        {
+            return;
+        }
+        isSubmitting = true;
+        errorMessage =null;
+        try
+        {
+            // Call the Registration function from the UserService class
+            await UserService.UserRegisterAsync(registerModel);
+
+            // Navigate to the login page once sign up is completed.
+            Navigation.NavigateTo("/login?registered=true");
+        }
+        catch (ArgumentException ex)
+        {
+            errorMessage = ex.Message;
+        }
+        catch(InvalidOperationException ex)
+        {
+            errorMessage = ex.Message;
+        }
+        catch (Exception)
+        {
+            errorMessage = "Registration failed. Please try again.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

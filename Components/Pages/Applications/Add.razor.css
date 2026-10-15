@@ -1,0 +1,16 @@
+.container{
+    color: var(--accent2)
+}
+.back-btn{
+    padding: .25rem;
+    background-color: var(--secondary);
+    color: var(--accent1);
+    padding: .5rem;
+    border-radius: .5rem;
+}
+.btn-primary{
+    background-color: var(--secondary);
+}
+a{
+    color: var(--accent2);
+}

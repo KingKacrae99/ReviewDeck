@@ -1,0 +1,78 @@
+
+@using ReviewDeck.Models
+
+@if (IsVisible && Job is not null)
+{
+    <div class="modal-backdrop show"></div>
+
+    <div class="modal d-block"
+         tabindex="-1"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="deleteApplicationTitle">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteApplicationTitle">
+                        Delete Application
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            aria-label="Close"
+                            disabled="@IsDeleting"
+                            @onclick="() => OnCancel.InvokeAsync()">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>
+                        Are you sure you want to delete
+                        <strong>@Job.JobTitle</strong> at
+                        <strong>@Job.Company</strong>?
+                    </p>
+
+                    <p class="text-danger mb-0">
+                        This action cannot be undone.
+                    </p>
+
+                    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+                    {
+                        <div class="alert alert-danger mt-3" role="alert">
+                            @ErrorMessage
+                        </div>
+                    }
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            disabled="@IsDeleting"
+                            @onclick="() => OnCancel.InvokeAsync()">
+                        Cancel
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-danger"
+                            disabled="@IsDeleting"
+                            @onclick="() => OnConfirm.InvokeAsync(Job)">
+                        @(IsDeleting ? "Deleting..." : "Delete application")
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public JobApplication? Job { get; set; }
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public bool IsDeleting { get; set; }
+    [Parameter] public string? ErrorMessage { get; set; }
+
+    [Parameter] public EventCallback<JobApplication> OnConfirm { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+}

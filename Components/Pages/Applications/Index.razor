@@ -1,0 +1,321 @@
+
+@page "/Applications"
+
+@using Microsoft.AspNetCore.Authorization
+@using ReviewDeck.Models
+@using ReviewDeck.Services
+
+@attribute [Authorize]
+
+@inject IJobApplicationService JobApplicationService
+@inject NavigationManager Navigation
+
+<PageTitle>Applications | ReviewDeck</PageTitle>
+
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1>My Applications</h1>
+            <p class="text-muted mb-0">
+                Manage and track your job search.
+            </p>
+        </div>
+        <a href="/Applications/New" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>
+            Add Application
+        </a>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @errorMessage
+        </div>
+    }
+    else if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary"
+                 role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">
+                Loading your applications...
+            </p>
+        </div>
+    }
+    else if (jobs.Count == 0)
+    {
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-folder2-open fs-1 text-muted"></i>
+                <h2 class="h4 mt-3">No applications yet</h2>
+                <p class="text-muted">
+                    Add your first job application to start
+                    tracking your progress.
+                </p>
+                <a href="/Applications/Add"
+                   class="btn btn-primary">
+                    Add Your First Application
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between
+                            align-items-center mb-3">
+                    <h2 class="h5 mb-0">All Applications</h2>
+
+                    <span class="badge text-bg-secondary">
+                        @jobs.Count applications
+                    </span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Job Title</th>
+                                <th>Company</th>
+                                <th>Type</th>
+                                <th>Work Mode</th>
+                                <th>Date Applied</th>
+                                <th>Status</th>
+                                <th>Job Posting</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var job in jobs)
+                            {
+                                <tr @key="job.Id">
+                                    <td>
+                                        <strong>@job.JobTitle</strong>
+
+                                        @if (!string.IsNullOrWhiteSpace(job.Location))
+                                        {
+                                            <div class="small text-muted">
+                                                @job.Location
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>@job.Company</td>
+                                    <td>@job.JobType</td>
+                                    <td>@job.JobMode</td>
+                                    <td>
+                                        @job.AppliedAt.ToString("dd MMM yyyy")
+                                    </td>
+
+                                    <td>
+                                        <span class="@GetStatusClass(job.Status)">
+                                            @job.Status
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <a href="@job.JobUrl"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            Open posting
+                                            <i class="bi bi-box-arrow-up-right"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary"
+                                                    @onclick="() => ViewDetails(job)">
+                                                View
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-secondary"
+                                                    @onclick="() => OpenEditModal(job)">
+                                                Edit
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    @onclick="() => OpenDeleteModal(job)">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="mt-3">
+        <button type="button"
+                class="btn btn-outline-secondary"
+                @onclick="GoToDashboard">
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Dashboard
+        </button>
+    </div>
+
+</div>
+
+<ApplicationDetailsModal
+    Job="@selectedJob"
+    IsVisible="@showDetailsModal"
+    OnClose="CloseModals"
+    OnEdit="OpenEditModal"
+    OnDelete="OpenDeleteModal"
+/>
+<EditApplicationModal
+    Job="@selectedJob"
+    IsVisible="@showEditModal"
+    OnSave="SaveEditedJob"
+    OnCancel="CloseModals"
+/>
+<DeleteApplicationModal
+    Job="@selectedJob"
+    IsVisible="@showDeleteModal"
+    IsDeleting="@isDeleting"
+    ErrorMessage="@deleteError"
+    OnConfirm="ConfirmDelete"
+    OnCancel="CloseModals"
+/>
+
+@code {
+    private List<JobApplication> jobs = new();
+    private bool isLoading = true;
+    private string? errorMessage;
+    private JobApplication? selectedJob;
+    private bool showDetailsModal;
+    private bool showEditModal;
+    private bool showDeleteModal;
+    private bool isDeleting;
+    private string? deleteError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            jobs = await JobApplicationService.GetJobsAsync();
+
+            jobs = jobs
+                .OrderByDescending(job => job.AppliedAt)
+                .ToList();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            errorMessage = "Please log in to view your applications.";
+        }
+        catch (Exception)
+        {
+            errorMessage = "We couldn't load your applications. Please try again.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "Applied" => "badge text-bg-primary",
+            "Interview" => "badge text-bg-info",
+            "Offered" => "badge text-bg-success",
+            "Rejected" => "badge text-bg-danger",
+            _ => "badge text-bg-secondary"
+        };
+    }
+
+    private void GoToDashboard()
+    {
+        Navigation.NavigateTo("/Dashboard");
+    }
+
+    private void ViewDetails(JobApplication job)
+    {
+        selectedJob = job;
+        showDetailsModal = true;
+        showEditModal = false;
+        showDeleteModal = false;
+    }
+
+    private void OpenEditModal(JobApplication job)
+    {
+        selectedJob = job;
+        showDetailsModal = false;
+        showEditModal = true;
+        showDeleteModal = false;
+    }
+
+    private void OpenDeleteModal(JobApplication job)
+    {
+        selectedJob = job;
+        showDetailsModal = false;
+        showEditModal = false;
+        showDeleteModal = true;
+        deleteError = null;
+    }
+
+    private void CloseModals()
+    {
+        showDetailsModal = false;
+        showEditModal = false;
+        showDeleteModal = false;
+        selectedJob = null;
+        deleteError = null;
+    }
+    private async Task SaveEditedJob(JobApplication editedJob)
+    {
+        var updatedJob = await JobApplicationService.UpdateJobAsync(editedJob);
+
+        if (updatedJob is null)
+        {
+            throw new InvalidOperationException(
+                "The application could not be found or updated.");
+        }
+
+        // Reload from the database so the list shows the saved values.
+        jobs = await JobApplicationService.GetJobsAsync();
+        CloseModals();
+    }
+
+    private async Task ConfirmDelete(JobApplication job)
+    {
+        if (isDeleting)
+            return;
+
+        isDeleting = true;
+        deleteError = null;
+
+        try
+        {
+            var deleted = await JobApplicationService.DeleteJobAsync(job.Id);
+
+            if (!deleted)
+            {
+                deleteError = "The application was not found or could not be deleted.";
+                return;
+            }
+
+            jobs = await JobApplicationService.GetJobsAsync();
+            CloseModals();
+        }
+        catch (Exception)
+        {
+            deleteError = "Unable to delete this application. Please try again.";
+        }
+        finally
+        {
+            isDeleting = false;
+        }
+    }
+
+}

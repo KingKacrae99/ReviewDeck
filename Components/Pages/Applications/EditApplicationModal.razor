@@ -1,0 +1,237 @@
+
+@using ReviewDeck.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+@if (IsVisible && Job is not null && editModel is not null)
+{
+    <div class="modal-backdrop show"></div>
+
+    <div class="modal d-block edit-application-modal"
+         tabindex="-1"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="editApplicationTitle">
+
+        <div class="modal-dialog modal-lg edit-application-dialog">
+            <div class="modal-content">
+
+                <EditForm Model="@editModel" OnValidSubmit="SaveAsync" class="edit-form">
+                    <DataAnnotationsValidator />
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editApplicationTitle">
+                            Edit Application
+                        </h5>
+
+                        <button type="button"
+                                class="btn-close"
+                                aria-label="Close"
+                                disabled="@isSaving"
+                                @onclick="CancelAsync">
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <ValidationSummary />
+
+                        <div class="mb-3">
+                            <label class="form-label" for="editTitle">Job title</label>
+                            <InputText id="editTitle"
+                                       class="form-control"
+                                       @bind-Value="editModel.JobTitle" />
+                            <ValidationMessage For="@(() => editModel.JobTitle)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="editCompany">Company</label>
+                            <InputText id="editCompany"
+                                       class="form-control"
+                                       @bind-Value="editModel.Company" />
+                            <ValidationMessage For="@(() => editModel.Company)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="editUrl">Job URL</label>
+                            <InputText id="editUrl"
+                                       class="form-control"
+                                       @bind-Value="editModel.JobUrl" />
+                            <ValidationMessage For="@(() => editModel.JobUrl)" />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="editLocation">Location</label>
+                                <InputText id="editLocation"
+                                           class="form-control"
+                                           @bind-Value="editModel.Location" />
+                                <ValidationMessage For="@(() => editModel.Location)" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="editPlatform">Platform</label>
+                                <InputText id="editPlatform"
+                                           class="form-control"
+                                           @bind-Value="editModel.Platform" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label" for="editStatus">Status</label>
+                                <InputSelect id="editStatus"
+                                             class="form-select"
+                                             @bind-Value="editModel.Status">
+                                    <option value="Applied">Applied</option>
+                                    <option value="Interview">Interview</option>
+                                    <option value="Rejected">Rejected</option>
+                                    <option value="Offered">Offered</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => editModel.Status)" />
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label" for="editJobType">Job type</label>
+                                <InputSelect id="editJobType"
+                                             class="form-select"
+                                             @bind-Value="editModel.JobType">
+                                    <option value="Fulltime">Full-time</option>
+                                    <option value="Part-Time">Part-time</option>
+                                    <option value="Contract">Contract</option>
+                                    <option value="Internship">Internship</option>
+                                    <option value="Freelance">Freelance</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => editModel.JobType)" />
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label" for="editMode">Work mode</label>
+                                <InputSelect id="editMode"
+                                             class="form-select"
+                                             @bind-Value="editModel.JobMode">
+                                    <option value="Remote">Remote</option>
+                                    <option value="Onsite">On-site</option>
+                                    <option value="Hybrid">Hybrid</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => editModel.JobMode)" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="editAppliedAt">Date applied</label>
+                            <InputDate id="editAppliedAt"
+                                       class="form-control"
+                                       @bind-Value="editModel.AppliedAt" />
+                            <ValidationMessage For="@(() => editModel.AppliedAt)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="editDescription">
+                                Job description
+                            </label>
+                            <InputTextArea id="editDescription"
+                                           class="form-control"
+                                           rows="4"
+                                           @bind-Value="editModel.Description" />
+                            <ValidationMessage For="@(() => editModel.Description)" />
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(errorMessage))
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                @errorMessage
+                            </div>
+                        }
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                disabled="@isSaving"
+                                @onclick="CancelAsync">
+                            Cancel
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary"
+                                disabled="@isSaving">
+                            @(isSaving ? "Saving..." : "Save changes")
+                        </button>
+                    </div>
+                </EditForm>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public JobApplication? Job { get; set; }
+    [Parameter] public bool IsVisible { get; set; }
+
+    [Parameter] public EventCallback<JobApplication> OnSave { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private JobApplication? editModel;
+    private int? loadedJobId;
+    private bool isSaving;
+    private string? errorMessage;
+
+    protected override void OnParametersSet()
+    {
+        if (Job is null)
+        {
+            editModel = null;
+            loadedJobId = null;
+            return;
+        }
+
+        // Initialize the copy when a different application is selected.
+        if (loadedJobId != Job.Id)
+        {
+            editModel = new JobApplication
+            {
+                Id = Job.Id,
+                UserId = Job.UserId,
+                JobTitle = Job.JobTitle,
+                Company = Job.Company,
+                JobUrl = Job.JobUrl,
+                Location = Job.Location,
+                Platform = Job.Platform,
+                Status = Job.Status,
+                JobType = Job.JobType,
+                JobMode = Job.JobMode,
+                AppliedAt = Job.AppliedAt,
+                Description = Job.Description,
+                CreatedAt = Job.CreatedAt,
+                UpdatedAt = Job.UpdatedAt
+            };
+
+            loadedJobId = Job.Id;
+            errorMessage = null;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (editModel is null || isSaving)
+            return;
+
+        isSaving = true;
+        errorMessage = null;
+
+        try
+        {
+            await OnSave.InvokeAsync(editModel);
+        }
+        catch (Exception)
+        {
+            errorMessage = "Unable to save changes. Please try again.";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private Task CancelAsync() => OnCancel.InvokeAsync();
+}

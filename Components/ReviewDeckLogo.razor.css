@@ -1,0 +1,17 @@
+.reviewdeck-logo {
+    border-radius: 999px;
+    width: 150px;
+    height: 150px;
+}
+
+.reviewdeck-logo img{
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+}
+@media (max-width:640.89px) {
+    .reviewdeck-logo {
+        width: 100px;
+        height: 100px;
+    }
+}

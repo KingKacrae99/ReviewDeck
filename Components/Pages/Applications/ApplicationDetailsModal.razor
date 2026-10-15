@@ -1,0 +1,102 @@
+
+@using ReviewDeck.Models
+
+@if (IsVisible && Job is not null)
+{
+    <div class="modal-backdrop show"></div>
+
+    <div class="modal d-block"
+         tabindex="-1"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="applicationDetailsTitle">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="applicationDetailsTitle">
+                        Application Details
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            aria-label="Close"
+                            @onclick="() => OnClose.InvokeAsync()">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <h4>@Job.JobTitle</h4>
+                    <p class="text-muted">@Job.Company</p>
+
+                    <dl class="row">
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8">@Job.Status</dd>
+
+                        <dt class="col-sm-4">Job type</dt>
+                        <dd class="col-sm-8">@Job.JobType</dd>
+
+                        <dt class="col-sm-4">Work mode</dt>
+                        <dd class="col-sm-8">@Job.JobMode</dd>
+
+                        <dt class="col-sm-4">Location</dt>
+                        <dd class="col-sm-8">@(Job.Location ?? "Not specified")</dd>
+
+                        <dt class="col-sm-4">Platform</dt>
+                        <dd class="col-sm-8">@(Job.Platform ?? "Not specified")</dd>
+
+                        <dt class="col-sm-4">Date applied</dt>
+                        <dd class="col-sm-8">@Job.AppliedAt.ToString("dd MMM yyyy")</dd>
+
+                        <dt class="col-sm-4">Job URL</dt>
+                        <dd class="col-sm-8">
+                            <a href="@Job.JobUrl"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                Open job posting
+                            </a>
+                        </dd>
+
+                        <dt class="col-sm-4">Description</dt>
+                        <dd class="col-sm-8">
+                            @(string.IsNullOrWhiteSpace(Job.Description)
+                                ? "No description provided."
+                                : Job.Description)
+                        </dd>
+                    </dl>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            @onclick="() => OnClose.InvokeAsync()">
+                        Close
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-danger"
+                            @onclick="() => OnDelete.InvokeAsync(Job)">
+                        Delete
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-primary"
+                            @onclick="() => OnEdit.InvokeAsync(Job)">
+                        Edit application
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public JobApplication? Job { get; set; }
+    [Parameter] public bool IsVisible { get; set; }
+
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<JobApplication> OnEdit { get; set; }
+    [Parameter] public EventCallback<JobApplication> OnDelete { get; set; }
+}

@@ -1,0 +1,490 @@
+@page "/Dashboard"
+
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+
+@attribute [Authorize]
+
+@using ReviewDeck.Models;
+@using ReviewDeck.Services;
+@inject IJobApplicationService JobApplicationService;
+@using Microsoft.AspNetCore.Components.Forms
+@inject NavigationManager Navigation
+
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle> User Dashboard </PageTitle>
+
+<div class="container-fluid dashboard-container">
+     <div class="row g-3">
+        @* Sidebar *@ 
+        <aside class="col-12 col-md-3"> 
+            <div class="sideNav border shadow-sm h-100">
+                <h1 class="text-center">Dashboard</h1>
+                <ul class="sidebar-links"> 
+                    <li><a href="/profile">Profile</a></li>
+                    <li><a href="/Applications">View Jobs</a></li>
+                </ul>
+
+                <div class="filters">
+                    <button class="@(isInterview ? "bg-primary text-white" : "")"
+                            type="button"
+                            @onclick="GetInterviewedJobs">
+                        Interviewed
+                    </button>
+
+                    <button class="@(isRejected ? "bg-danger text-white" : "")"
+                            type="button"
+                            @onclick="GetRejectedJobs">
+                        Rejected
+                    </button>
+
+                    <button class="@(isAccepted ? "bg-success text-white" : "")"
+                            type="button"
+                            @onclick="GetOfferedJobs">
+                        Accepted
+                    </button>
+
+                    <button class="@(isIntern ? "bg-secondary text-white" : "")"
+                            type="button"
+                            @onclick="GetInternshipJobs">
+                        Internship
+                    </button>
+
+                    <button class="@(isContract ? "bg-warning text-dark" : "")"
+                            type="button"
+                            @onclick="GetContractJobs">
+                        Contract
+                    </button>
+
+                    <button class="@(isPartTime ? "bg-secondary text-white" : "")"
+                            type="button"
+                            @onclick="GetPartTimeJobs">
+                        Part-Time
+                    </button>
+
+                    <button class="@(isFullTime ? "bg-success text-white" : "")"
+                            type="button"
+                            @onclick="GetFullTimeJobs">
+                        Full-Time
+                    </button>
+
+                    <button class="@(isHybrid ? "bg-info text-dark" : "")"
+                            type="button"
+                            @onclick="GetHybridJobs">
+                        Hybrid
+                    </button>
+
+                    <button class="@(isOnsite ? "bg-info text-dark" : "")"
+                            type="button"
+                            @onclick="GetOnsiteJobs">
+                        Onsite
+                    </button>
+
+                    <button class="@(isRemote ? "bg-dark text-white" : "")"
+                            type="button"
+                            @onclick="GetRemoteJobs">
+                        Remote
+                    </button>
+
+                    <button type="button"
+                            class="@(IsAllSelected ? "bg-primary text-white" : "")"
+                            @onclick="ShowAllJobs">
+                        Show All
+                    </button>
+                </div>
+            </div> 
+        </aside>
+
+        @* Dashboard content *@ 
+        <main class="col-12 col-md-9"> 
+            <section class="row g-3">
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <Card Title="Total Applications" Value="@totalJobs.Count()" Icon=" bi bi-briefcase-fill" />
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <Card Title="Interviews" Value="@interviewedJobs.Count()" Icon="bi bi-calendar-check-fill" />
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <Card Title="Offers" Value="@offeredJobs.Count()" Icon="bi bi-trophy-fill" />
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <Card Title="Rejections" Value="@rejectedJobs.Count()" Icon="bi bi-x-circle-fill" /> 
+                </div>
+            </section>
+
+            <section class="recent-jobs">
+                <div class="heading">
+                    <div>
+                        <h1>Recent Applications</h1>
+                        <p class="subtitle">Track and manage your job applications.</p>
+                    </div>
+                    <button class="btn btn-primary"
+                        type="button"
+                        @onclick="@(() => Navigation.NavigateTo("/Applications/Add"))">
+                        <i class="bi bi-plus-lg"></i>
+                        Add Application
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table applications-table">
+                    <thead>
+                        <tr>
+                        <th></th>
+                        <th>Title</th>
+                        <th>Company</th>
+                        <th>Job Type</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (recentJobs.Any())
+                        {
+                        foreach (JobApplication job in recentJobs)
+                        {
+                            <tr>
+                            <td>
+                                <div class="job-icon">
+                                <i class="bi bi-briefcase-fill"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="job-title">
+                                <span>@job.JobTitle</span>
+                                <small>Job Application</small>
+                                </div>
+                            </td>
+                            <td><span class="company-name">@job.Company</span></td>
+                            <td><span class="job-type">@job.JobType</span></td>
+                            <td><span class="application-date">@job.CreatedAt.ToString("dd MMM yyyy")</span></td>
+                            <td><span class="status-badge">@job.Status</span></td>
+                            <td>
+                                <button class="action-btn" type="button" aria-label="More actions">
+                                <i class="bi bi-three-dots"></i>
+                                </button>
+                            </td>
+                            </tr>
+                        }
+                        }
+                        else
+                        {
+                        <tr>
+                            <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                <i class="bi bi-folder2-open"></i>
+                                </div>
+                                <h3>No applications yet</h3>
+                                <p>Your job applications will appear here once you start applying.</p>
+                                <button class="btn btn-primary">
+                                <i class="bi bi-plus-lg"></i> Add Your First Application
+                                </button>
+                            </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+
+
+@code {
+    // Application lists
+    private List<JobApplication> recentJobs = new();
+    private List<JobApplication> totalJobs = new();
+    private List<JobApplication> interviewedJobs = new();
+    private List<JobApplication> offeredJobs = new();
+    private List<JobApplication> rejectedJobs = new();
+
+    // Job type lists
+    private List<JobApplication> internshipJobs = new();
+    private List<JobApplication> contractJobs = new();
+    private List<JobApplication> partTimeJobs = new();
+    private List<JobApplication> fullTimeJobs = new();
+    private List<JobApplication> hybridJobs = new();
+    private List<JobApplication> onsiteJobs = new();
+    private List<JobApplication> remoteJobs = new();
+
+    // Filter states
+    private bool isInterview;
+    private bool isRejected;
+    private bool isAccepted;
+    private bool isIntern;
+    private bool isFullTime;
+    private bool isContract;
+    private bool isPartTime;
+    private bool isRemote;
+    private bool isOnsite;
+    private bool isHybrid;
+
+    // True when no filter is selected
+    private bool IsAllSelected =>
+        !isInterview &&
+        !isRejected &&
+        !isAccepted &&
+        !isIntern &&
+        !isFullTime &&
+        !isContract &&
+        !isPartTime &&
+        !isRemote &&
+        !isOnsite &&
+        !isHybrid;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState =
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        var user = authState.User;
+        var userIdValue = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (user.Identity?.IsAuthenticated != true ||
+            !int.TryParse(userIdValue, out var userId) ||
+            userId <= 0)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        // Load applications
+        var jobs = await JobApplicationService.GetJobsAsync();
+
+        totalJobs = jobs.ToList();
+
+        // Initially display the latest 10 applications
+        RefreshRecentJobs(totalJobs);
+
+        // Filter by application status
+        interviewedJobs = totalJobs
+            .Where(j => j.Status == "Interview")
+            .ToList();
+
+        offeredJobs = totalJobs
+            .Where(j => j.Status == "Offered")
+            .ToList();
+
+        rejectedJobs = totalJobs
+            .Where(j => j.Status == "Rejected")
+            .ToList();
+
+        // Filter by job type
+        internshipJobs = totalJobs
+            .Where(j => j.JobType == "Internship")
+            .ToList();
+
+        contractJobs = totalJobs
+            .Where(j => j.JobType == "Contract")
+            .ToList();
+
+        partTimeJobs = totalJobs
+            .Where(j => j.JobType == "Part-Time")
+            .ToList();
+
+        fullTimeJobs = totalJobs
+            .Where(j => j.JobType == "Full-Time")
+            .ToList();
+
+        hybridJobs = totalJobs
+            .Where(j => j.JobType == "Hybrid")
+            .ToList();
+
+        onsiteJobs = totalJobs
+            .Where(j => j.JobType == "Onsite")
+            .ToList();
+
+        remoteJobs = totalJobs
+            .Where(j => j.JobType == "Remote")
+            .ToList();
+    }
+
+    // Display the latest 10 applications from a given list
+    private void RefreshRecentJobs(IEnumerable<JobApplication> jobs)
+    {
+        recentJobs = jobs
+            .OrderByDescending(j => j.AppliedAt)
+            .Take(10)
+            .ToList();
+    }
+
+    // Reset all filter states
+    private void ResetFilters()
+    {
+        isInterview = false;
+        isRejected = false;
+        isAccepted = false;
+        isIntern = false;
+        isFullTime = false;
+        isContract = false;
+        isPartTime = false;
+        isRemote = false;
+        isOnsite = false;
+        isHybrid = false;
+    }
+
+
+    // Display all applications
+    private void ShowAllJobs()
+    {
+        ResetFilters();
+        RefreshRecentJobs(totalJobs);
+    }
+
+
+    // Interviewed applications
+    private void GetInterviewedJobs()
+    {
+        if (isInterview)
+        {
+            ShowAllJobs();
+            return;
+        }
+        ResetFilters();
+        isInterview = true;
+        RefreshRecentJobs(interviewedJobs);
+    }
+
+
+    // Accepted / offered applications
+    private void GetOfferedJobs()
+    {
+        if (isAccepted)
+        {
+            ShowAllJobs();
+            return;
+        }
+        ResetFilters();
+        isAccepted = true;
+        RefreshRecentJobs(offeredJobs);
+    }
+
+
+    // Rejected applications
+    private void GetRejectedJobs()
+    {
+        if (isRejected)
+        {
+            ShowAllJobs();
+            return;
+        }
+        ResetFilters();
+        isRejected = true;
+        RefreshRecentJobs(rejectedJobs);
+    }
+
+
+    // Internship applications
+    private void GetInternshipJobs()
+    {
+        if (isIntern)
+        {
+            ShowAllJobs();
+            return;
+        }
+        ResetFilters();
+        isIntern = true;
+        RefreshRecentJobs(internshipJobs);
+    }
+
+
+    // Contract applications
+    private void GetContractJobs()
+    {
+        if (isContract)
+        {
+            ShowAllJobs();
+            return;
+        }
+        ResetFilters();
+        isContract = true;
+        RefreshRecentJobs(contractJobs);
+    }
+
+
+    // Part-time applications
+    private void GetPartTimeJobs()
+    {
+        if (isPartTime)
+        {
+            ShowAllJobs();
+            return;
+        }
+        ResetFilters();
+        isPartTime = true;
+        RefreshRecentJobs(partTimeJobs);
+    }
+
+
+    // Full-time applications
+    private void GetFullTimeJobs()
+    {
+        if (isFullTime)
+        {
+            ShowAllJobs();
+            return;
+        }
+
+        ResetFilters();
+        isFullTime = true;
+        RefreshRecentJobs(fullTimeJobs);
+    }
+
+
+    // Hybrid applications
+    private void GetHybridJobs()
+    {
+        if (isHybrid)
+        {
+            ShowAllJobs();
+            return;
+        }
+
+        ResetFilters();
+        isHybrid = true;
+        RefreshRecentJobs(hybridJobs);
+    }
+
+
+    // Onsite applications
+    private void GetOnsiteJobs()
+    {
+        if (isOnsite)
+        {
+            ShowAllJobs();
+            return;
+        }
+
+        ResetFilters();
+        isOnsite = true;
+        RefreshRecentJobs(onsiteJobs);
+    }
+
+
+    // Remote applications
+    private void GetRemoteJobs()
+    {
+        if (isRemote)
+        {
+            ShowAllJobs();
+            return;
+        }
+
+        ResetFilters();
+        isRemote = true;
+        RefreshRecentJobs(remoteJobs);
+    }
+}
