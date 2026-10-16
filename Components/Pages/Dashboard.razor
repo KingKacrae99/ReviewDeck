@@ -1,4 +1,4 @@
-@page "/"
+@page "/dashboard"
 
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authorization
@@ -10,6 +10,7 @@
 @using ReviewDeck.Services;
 @inject IJobApplicationService JobApplicationService;
 @using Microsoft.AspNetCore.Components.Forms
+@using ReviewDeck.Components.Pages.Applications
 @inject NavigationManager Navigation
 
 
@@ -168,8 +169,10 @@
                             <td><span class="application-date">@job.CreatedAt.ToString("dd MMM yyyy")</span></td>
                             <td><span class="status-badge">@job.Status</span></td>
                             <td>
-                                <button class="action-btn" type="button" aria-label="More actions">
-                                <i class="bi bi-three-dots"></i>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        @onclick="() => ViewDetails(job)">
+                                    View
                                 </button>
                             </td>
                             </tr>
@@ -199,6 +202,28 @@
         </main>
     </div>
 </div>
+
+<ApplicationDetailsModal
+    Job="@selectedJob"
+    IsVisible="@showDetailsModal"
+    OnClose="CloseModals"
+    OnEdit="OpenEditModal"
+    OnDelete="OpenDeleteModal"
+/>
+<EditApplicationModal
+    Job="@selectedJob"
+    IsVisible="@showEditModal"
+    OnSave="SaveEditedJob"
+    OnCancel="CloseModals"
+/>
+<DeleteApplicationModal
+    Job="@selectedJob"
+    IsVisible="@showDeleteModal"
+    IsDeleting="@isDeleting"
+    ErrorMessage="@deleteError"
+    OnConfirm="ConfirmDelete"
+    OnCancel="CloseModals"
+/>
 
 
 
@@ -230,6 +255,14 @@
     private bool isRemote;
     private bool isOnsite;
     private bool isHybrid;
+
+    private JobApplication? selectedJob;
+    private bool showDetailsModal;
+    private bool showEditModal;
+    private bool showDeleteModal;
+    private bool isDeleting;
+    private string? deleteError;
+
 
     // True when no filter is selected
     private bool IsAllSelected =>
@@ -313,6 +346,13 @@
     }
 
     // Display the latest 10 applications from a given list
+    private void ViewDetails(JobApplication job)
+    {
+        selectedJob = job;
+        showDetailsModal = true;
+        showEditModal = false;
+        showDeleteModal = false;
+    }
     private void RefreshRecentJobs(IEnumerable<JobApplication> jobs)
     {
         recentJobs = jobs
@@ -486,5 +526,75 @@
         ResetFilters();
         isRemote = true;
         RefreshRecentJobs(remoteJobs);
+    }
+    private void OpenEditModal(JobApplication job)
+    {
+        selectedJob = job;
+        showDetailsModal = false;
+        showEditModal = true;
+        showDeleteModal = false;
+    }
+
+    private void OpenDeleteModal(JobApplication job)
+    {
+        selectedJob = job;
+        showDetailsModal = false;
+        showEditModal = false;
+        showDeleteModal = true;
+        deleteError = null;
+    }
+
+    private void CloseModals()
+    {
+        showDetailsModal = false;
+        showEditModal = false;
+        showDeleteModal = false;
+        selectedJob = null;
+        deleteError = null;
+    }
+    private async Task SaveEditedJob(JobApplication editedJob)
+    {
+        var updatedJob = await JobApplicationService.UpdateJobAsync(editedJob);
+
+        if (updatedJob is null)
+        {
+            throw new InvalidOperationException(
+                "The application could not be found or updated.");
+        }
+
+        // Reload from the database so the list shows the saved values.
+        totalJobs = await JobApplicationService.GetJobsAsync();
+        CloseModals();
+    }
+
+    private async Task ConfirmDelete(JobApplication job)
+    {
+        if (isDeleting)
+            return;
+
+        isDeleting = true;
+        deleteError = null;
+
+        try
+        {
+            var deleted = await JobApplicationService.DeleteJobAsync(job.Id);
+
+            if (!deleted)
+            {
+                deleteError = "The application was not found or could not be deleted.";
+                return;
+            }
+
+            totalJobs = await JobApplicationService.GetJobsAsync();
+            CloseModals();
+        }
+        catch (Exception)
+        {
+            deleteError = "Unable to delete this application. Please try again.";
+        }
+        finally
+        {
+            isDeleting = false;
+        }
     }
 }

@@ -1,0 +1,19 @@
+.btn-primary, .btn-sm{
+    background-color: var(--secondary);
+    color: var(--accent1);
+}
+.btn-outline-primary{
+    border-color: var(--secondary);
+}
+.btn-outline-secondary{
+    color: var(--accent1);
+    background-color: var(--secondary);
+}
+.badge{
+    background: var(--secondary);
+}
+td a{
+    text-decoration: none;
+    color: var(--accent2);
+    font-size: .8rem;
+}
