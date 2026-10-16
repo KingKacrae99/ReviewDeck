@@ -184,7 +184,7 @@
 
 .trusted-section > p:first-child {
     margin-bottom: 1.5rem;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .platform-list {
@@ -228,7 +228,7 @@
 
 .section-heading > p:last-child,
 .cta-content > p:not(.section-eyebrow) {
-    color: #64748b;
+    color: var(--secondary);
     line-height: 1.8;
 }
 
@@ -281,7 +281,7 @@
 .benefit-card p,
 .benefits-note p {
     margin-bottom: 0;
-    color: #64748b;
+    color: var(--secondary);
     line-height: 1.75;
 }
 

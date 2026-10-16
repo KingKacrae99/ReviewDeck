@@ -317,7 +317,14 @@ a, .navLinks{
     padding: 0;
     list-style: none;
 }
-
+.footer-column .footer-logout{
+    background-color: var(--primary);
+    color: var(--secondary);
+    padding: .2rem;
+    border-radius: .5rem;
+    border: 1px solid var(--accent1);
+    width: 8rem;
+}
 .footer-column a {
     color: #aab6ca;
     text-decoration: none;

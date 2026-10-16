@@ -29,6 +29,9 @@
     padding: .5rem;
     margin-left: .5rem;
 }
+.register-title h1{
+    font-size: 1.5rem;
+}
 .signup-content{
     padding: 1rem;
     margin: 0rem;

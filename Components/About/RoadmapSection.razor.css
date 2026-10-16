@@ -1,0 +1,79 @@
+
+.about-roadmap {
+    background: var(--about-surface);
+}
+
+.roadmap-heading {
+    max-width: 780px;
+    margin: 0 auto 2.5rem;
+}
+
+.roadmap-heading h2 {
+    max-width: 700px;
+    margin-bottom: 1.5rem;
+    font-size: clamp(1.9rem, 3.5vw, 3rem);
+    letter-spacing: -0.04em;
+    line-height: 1.2;
+}
+
+.roadmap-heading > p {
+    max-width: 650px;
+}
+
+.roadmap-feature {
+    max-width: 1180px;
+    margin-inline: auto;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    border: 1px solid var(--about-line);
+    border-radius: 16px;
+    background: var(--about-accent);
+}
+
+.roadmap-feature-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.roadmap-symbol {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    place-items: center;
+    border-radius: 12px;
+    background: var(--about-ink);
+    color: var(--about-line);
+    font-size: 1.5rem;
+}
+
+.roadmap-status {
+    color: var(--about-line);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.roadmap-feature h3 {
+    margin-bottom: 1rem;
+    font-size: clamp(1.45rem, 2.5vw, 2rem);
+    color: var(--about-surface);
+}
+
+.roadmap-feature p {
+    max-width: 760px;
+    color: var(--about-line);
+}
+
+.roadmap-feature p:last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 760px) {
+    .about-roadmap {
+        padding: 3.5rem 1.25rem;
+    }
+}

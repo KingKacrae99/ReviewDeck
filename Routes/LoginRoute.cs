@@ -95,7 +95,7 @@ public static class LoginRoutes
 
         httpContext.Response.Headers.CacheControl = "no-store";
 
-        return Results.Redirect("/");
+        return Results.Redirect("/Dashboard");
     }
 
     private static async Task<IResult> HandleLogout(
