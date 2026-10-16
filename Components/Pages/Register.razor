@@ -46,13 +46,23 @@
                     </div>
                 </fieldset>
                 <div class="form-group mb-3">
-                    <label for="Email">Email</label>
-                    <InputText id="email" @bind-Value="@registerModel.Email" class="form-control" placeholder="Enter a valid email..." required/>
+                    <label for="email">Email</label>
+                    <InputText id="email" @bind-Value="@registerModel.Email" 
+                    class="form-control" 
+                    placeholder="Enter a valid email..." 
+                    required
+                    autocomplete="email"
+                />
                     <ValidationMessage For="@(()=> registerModel.Email)"/>
                 </div>
                 <div class="form-group mb-3">
-                    <label for="Phone">Phone <span>(optional)</span></label>
-                    <InputText id="phone" @bind-Value="@registerModel.Phone" class="form-control" placeholder="Enter a valid phone number"/>
+                    <label for="phone">Phone <span>(optional)</span></label>
+                    <InputText id="phone"
+                     @bind-Value="@registerModel.Phone"
+                    class="form-control" 
+                    placeholder="Enter a valid phone number"
+                    autocomplete="phone"
+                />
                     <ValidationMessage For="@(()=> @registerModel.Phone)"/>
                 </div>
                 <fieldset class="auth-key">

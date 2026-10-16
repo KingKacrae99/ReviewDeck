@@ -2,8 +2,23 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Web
 
-<Router AppAssembly="typeof(Program).Assembly"
-        NotFoundPage="typeof(Pages.NotFound)">
+<Router AppAssembly="typeof(Program).Assembly">
+        <NotFound>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <div class="container py-5 text-center">
+                    <h1 class="display-5 fw-bold">Page not found</h1>
+
+                    <p class="lead mt-3">
+                        We couldn't find the page you requested.
+                        Check the address or return to the dashboard.
+                    </p>
+
+                    <a href="/" class="btn btn-primary mt-3">
+                        Go to dashboard
+                    </a>
+                </div>
+            </LayoutView>
+        </NotFound>
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="routeData"
                             DefaultLayout="typeof(Layout.MainLayout)">

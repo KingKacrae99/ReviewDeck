@@ -3,8 +3,8 @@
     flex-direction: column;
     min-height: 100vh;
     min-height: 100dvh;
-    background: var(--page-bg, #f8fafc);
-    color: var(--text-color, #172033);
+    background: var(--primary);
+    color: var(--secondary);
 }
 
 .site-main {
@@ -19,10 +19,6 @@
     box-sizing: border-box;
 }
 
-/* =========================
-   HEADER
-========================= */
-
 .site-header {
     position: relative;
     z-index: 100;
@@ -30,17 +26,16 @@
     align-items: center;
     justify-content: space-between;
     gap: 2rem;
-
     width: 100%;
     min-height: 5.5rem;
     padding: 0.5rem clamp(1rem, 4vw, 3.5rem);
     box-sizing: border-box;
-
-    background: var(--primary, #14213d);
-    box-shadow: 0 3px 12px rgb(15 23 42 / 12%);
+    background: var(--primary);
+    color: var(--secondary);
+    box-shadow: 0 3px 12px rgb(20 33 61 / 12%);
 }
 
-.navLinks{
+a, .navLinks{
     text-decoration: none;
     color: var(--accent2);
 }
@@ -52,8 +47,7 @@
     align-items: center;
     gap: 0.65rem;
     flex-shrink: 0;
-
-    color: var(--secondary, #ffffff);
+    color: var(--accent2);
     text-decoration: none;
 }
 
@@ -65,6 +59,7 @@
 }
 
 .logo-text {
+    color: var(--accent2);
     font-size: 1.3rem;
     font-weight: 750;
     letter-spacing: -0.04em;
@@ -82,29 +77,28 @@
     align-items: center;
     justify-content: center;
     gap: clamp(1rem, 2vw, 2rem);
-
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
+
 .main-nav a {
     position: relative;
     display: inline-flex;
     align-items: center;
-
     padding: 0.7rem 0;
-    color: var(--secondary, #ffffff);
+    color: var(--secondary);
     text-decoration: none;
     font-size: 0.94rem;
     font-weight: 500;
-
     opacity: 0.85;
     transition: opacity 180ms ease, color 180ms ease;
 }
 
-.main-nav a:hover {
-    color: var(--accent2, #fca311);
+.main-nav a:hover,
+.main-nav a.active {
+    color: var(--accent2);
     opacity: 1;
 }
 
@@ -118,23 +112,21 @@
     right: 0;
     bottom: 0;
     left: 0;
-
     height: 2px;
     border-radius: 2px;
-    background: var(--accent2, #fca311);
+    background: var(--accent2);
     content: "";
 }
 
-.main-nav a:focus-visible,
+.nav-logout:focus-visible,
 .auth-links a:focus-visible,
+.main-nav a:focus-visible,
 .logo:focus-visible,
 .small-nav a:focus-visible,
 .footer-column a:focus-visible {
-    outline: 2px solid var(--accent2, #fca311);
+    outline: 2px solid var(--accent1);
     outline-offset: 4px;
-    border-radius: 3px;
 }
-
 /* Authentication links */
 
 .auth-links {
@@ -149,17 +141,15 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     min-height: 2.7rem;
     padding: 0.6rem 1rem;
+    border: 1px solid transparent;
     border-radius: 0.55rem;
-
-    color: var(--secondary, #ffffff);
+    color: var(--accent2);
     text-decoration: none;
     font-size: 0.92rem;
     font-weight: 600;
-
-    transition: background 180ms ease, transform 180ms ease;
+    transition: background-color 180ms ease, color 180ms ease;
 }
 
 .auth-links .login-link {
@@ -168,17 +158,47 @@
 }
 
 .auth-links .login-link:hover {
-    color: var(--accent2, #fca311);
+    color: var(--secondary);
 }
 
 .auth-links .signup-link {
-    background: var(--accent1, #2563eb);
-    color: #ffffff;
+    background: var(--accent2);
+    border-color: var(--accent1);
+    color: var(--primary);
 }
 
 .auth-links .signup-link:hover {
-    filter: brightness(1.1);
-    transform: translateY(-1px);
+    background: var(--primary);
+    color: var(--secondary);
+}
+
+.nav-logout-form {
+    margin: 0;
+}
+
+.nav-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.7rem;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--accent2);
+    border-radius: 0.55rem;
+    background: transparent;
+    color: var(--accent2);
+    font: inherit;
+    cursor: pointer;
+    transition: background-color 180ms ease, color 180ms ease;
+}
+
+.main-nav .custom-link {
+    color: var(--accent2);
+    text-decoration: none;
+}
+
+.nav-logout:hover {
+    background: var(--primary);
+    color: var(--secondary);
 }
 
 /* =========================
@@ -191,15 +211,12 @@
     justify-content: center;
     align-items: center;
     gap: 5px;
-
     width: 2.75rem;
     height: 2.75rem;
     padding: 0.5rem;
-
     border: 1px solid rgb(255 255 255 / 20%);
     border-radius: 0.5rem;
     background: transparent;
-
     cursor: pointer;
 }
 
@@ -268,6 +285,7 @@
     width: 3rem;
     height: 3rem;
     object-fit: contain;
+    border-radius: 999px;
 }
 
 .footer-brand > p {
@@ -428,6 +446,25 @@
     .hamburger {
         display: flex;
         flex-shrink: 0;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        width: 2.75rem;
+        height: 2.75rem;
+        padding: 0.5rem;
+        border: 1px solid var(--secondary);
+        border-radius: 0.5rem;
+        background: var(--secondary);
+        cursor: pointer;
+    }
+
+    .hamburger span {
+        display: block;
+        width: 1.25rem;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--primary);
     }
 
     .small-nav.open {
@@ -436,20 +473,17 @@
         top: 100%;
         right: 0;
         left: 0;
-
-        padding: 0.75rem 1rem 1rem;
+        padding: 0.75rem .5rem .5rem;
         box-sizing: border-box;
-
-        background: var(--primary, #14213d);
-        box-shadow: 0 8px 12px rgb(15 23 42 / 15%);
-        border-top: 1px solid rgb(255 255 255 / 10%);
+        background: var(--primary);
+        box-shadow: 0 8px 12px rgb(20 33 61 / 15%);
+        border-top: 1px solid var(--accent1);
     }
 
     .small-nav ul {
         display: flex;
         flex-direction: column;
         gap: 0.25rem;
-
         margin: 0;
         padding: 0;
         list-style: none;
@@ -461,24 +495,31 @@
 
     .small-nav a {
         display: block;
-        padding: 0.8rem 0.75rem;
-        border-radius: 0.4rem;
-
-        color: var(--secondary, #ffffff);
+        padding: 0.25rem 0.75rem;
+        color: var(--accent2);
         text-decoration: none;
         font-size: 0.95rem;
+        border-bottom: 1px solid var(--accent2);
     }
 
     .small-nav a:hover,
     .small-nav a.active {
-        background: rgb(255 255 255 / 8%);
-        color: var(--accent2, #fca311);
+        background: var(--accent2);
+        color: var(--primary);
     }
 
     .small-nav .mobile-auth {
-        border-top: 1px solid rgb(255 255 255 / 12%);
-        margin-top: 0.35rem;
-        padding-top: 0.35rem;
+        margin-top: 0rem;
+        padding-top: 0rem;
+    }
+
+    .small-nav form {
+        margin: 0;
+        padding: 0.4rem 0.75rem;
+    }
+
+    .small-nav .nav-logout {
+        width: 100%;
     }
 
     .footer-main {

@@ -1,38 +1,83 @@
 ﻿
 @inherits LayoutComponentBase
 
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+
 <div class="page">
     <header class="site-header">
         <a href="/" class="logo" aria-label="ReviewDeck home">
             <img src="/image/ReviewDeck_logo.png"
-                 alt="ReviewDeck"
+                 alt=""
                  width="72"
                  height="72" />
             <span class="logo-text">ReviewDeck</span>
         </a>
 
-        <nav class="main-nav" aria-label="Main navigation">
-            <ul>
-                <li>
-                    <a class="navLinks" href="/">Dashboard</a>
-                </li>
-                <li>
-                    <a class="navLinks" href="/Application">Jobs Application</a>
-                </li>
-                <li>
-                    <a class="navLinks" href="/Application/Add">create application</a>
-                </li>
-            </ul>
-        </nav>
+        <AuthorizeView>
+            <Authorized>
+                <nav class="main-nav" aria-label="Main navigation">
+                    <ul>
+                        <li>
+                            <a class="navLinks"
+                                     href="/">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a class="navLinks"
+                                     href="/Applications">
+                                Applications
+                            </a>
+                        </li>
+                        <li>
+                            <a class="navLinks"
+                                     href="/Applications/New">
+                                New application
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
 
-        <div class="auth-links">
-            <a href="/login" class="login-link">
-                Log in
-            </a>
-            <a href="/register" class="navLinks">
-                Get started
-            </a>
-        </div>
+                <div class="auth-links">
+                    <form method="post"
+                          action="/account/logout"
+                          class="nav-logout-form">
+                        <AntiforgeryToken />
+                        <button type="submit" class="nav-logout">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </Authorized>
+
+            <NotAuthorized>
+                <nav class="main-nav" aria-label="Main navigation">
+                    <ul>
+                        <li>
+                            <a class="custom-link" href="/" Match="NavLinkMatch.All">
+                                Home
+                            </a>
+                        </li>
+                        <li>
+                            <a class="navLinks" href="/about">
+                                About
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div class="auth-links">
+                    <a href="/login" class="login-link">
+                        Log in
+                    </a>
+                    <a href="/register" class="signup-link">
+                        Get started
+                    </a>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
 
         <button class="hamburger"
                 type="button"
@@ -50,51 +95,98 @@
              aria-label="Mobile navigation"
              aria-hidden="@(!isMenuOpen)">
 
-            <ul>
-                <li>
-                    <NavLink href="/"
-                             Match="NavLinkMatch.All"
-                             @onclick="CloseMenu">
-                        Home
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/dashboard"
-                             @onclick="CloseMenu">
-                        Dashboard
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/record"
-                             @onclick="CloseMenu">
-                        Records
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/about"
-                             @onclick="CloseMenu">
-                        About
-                    </NavLink>
-                </li>
-                <li class="mobile-auth">
-                    <NavLink href="/login"
-                             @onclick="CloseMenu">
-                        Log in
-                    </NavLink>
-                </li>
-                <li class="mobile-auth">
-                    <NavLink href="/register"
-                             @onclick="CloseMenu">
-                        Get started
-                    </NavLink>
-                </li>
-            </ul>
+            <AuthorizeView>
+                <Authorized>
+                    <ul>
+                        <li>
+                            <a href="/Dashboard"
+                                     @onclick="CloseMenu">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/Applications"
+                                     @onclick="CloseMenu">
+                                Applications
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/Applications/Add"
+                                     @onclick="CloseMenu">
+                                New application
+                            </a>
+                        </li>
+                        <li class="mobile-auth">
+                            <form method="post"
+                                  action="/account/logout">
+                                <AntiforgeryToken />
+                                <button type="submit" class="nav-logout">
+                                    Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </Authorized>
+
+                <NotAuthorized>
+                    <ul>
+                        <li>
+                            <a href="/"
+                                     Match="NavLinkMatch.All"
+                                     @onclick="CloseMenu">
+                                Home
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/about"
+                                     @onclick="CloseMenu">
+                                About
+                            </a>
+                        </li>
+                        <li class="mobile-auth">
+                            <a href="/login"
+                                     @onclick="CloseMenu">
+                                Log in
+                            </a>
+                        </li>
+                        <li class="mobile-auth">
+                            <a href="/register"
+                                     @onclick="CloseMenu">
+                                Get started
+                            </a>
+                        </li>
+                    </ul>
+                </NotAuthorized>
+            </AuthorizeView>
         </nav>
     </header>
 
     <main class="site-main">
         <article class="content">
-            @Body
+            <ErrorBoundary @ref="errorBoundary">
+                <ChildContent>
+                    @Body
+                </ChildContent>
+
+                <ErrorContent>
+                    <div class="container py-5 text-center error-panel">
+                        <h2>Something went wrong</h2>
+                        <p>
+                            An unexpected error occurred.
+                            You can try again or return to the dashboard.
+                        </p>
+
+                        <button class="btn-brand"
+                                @onclick="RecoverBoundary">
+                            Try again
+                        </button>
+
+                        <a href="/Dashboard" class="btn-brand-outline">
+                            Dashboard
+                        </a>
+                    </div>
+                </ErrorContent>
+            </ErrorBoundary>
         </article>
     </main>
 
@@ -102,10 +194,11 @@
         <div class="footer-main">
             <div class="footer-brand">
                 <a href="/" class="footer-logo">
-                    <img src="/image/ReviewDeck_logo.png"
-                         alt=""
+                    <img src="/image/sm-ReviewDeck.jpg"
+                         alt="ReviewDeck"
                          width="48"
-                         height="48" />
+                         height="48"
+                         loading="lazy" />
                     <span>ReviewDeck</span>
                 </a>
 
@@ -119,18 +212,60 @@
             <div class="footer-column">
                 <h2>Explore</h2>
                 <ul>
-                    <li><NavLink href="/">Home</NavLink></li>
-                    <li><NavLink href="/dashboard">Dashboard</NavLink></li>
-                    <li><NavLink href="/record">Records</NavLink></li>
-                    <li><NavLink href="/about">About us</NavLink></li>
+                    <li><a href="/">Home</a></li>
+                    <li>
+                        <AuthorizeView>
+                            <Authorized>
+                                <a href="/">Dashboard</a>
+                            </Authorized>
+                            <NotAuthorized>
+                                <a href="/about">About us</a>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </li>
+                    <AuthorizeView>
+                        <Authorized>
+                            <li>
+                                <a href="/Applications">
+                                    Applications
+                                </a>
+                            </li>
+                        </Authorized>
+                    </AuthorizeView>
                 </ul>
             </div>
 
             <div class="footer-column">
                 <h2>Your account</h2>
                 <ul>
-                    <li><NavLink href="/login">Log in</NavLink></li>
-                    <li><NavLink href="/register">Create account</NavLink></li>
+                    <AuthorizeView>
+                        <Authorized>
+                            <li>
+                                <a href="/Applications/Add">
+                                    Create application
+                                </a>
+                            </li>
+                            <li>
+                                <form method="post"
+                                      action="/account/logout">
+                                    <AntiforgeryToken />
+                                    <button type="submit" class="footer-logout">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </Authorized>
+                        <NotAuthorized>
+                            <li>
+                                <a href="/login">Log in</a>
+                            </li>
+                            <li>
+                                <a href="/register">
+                                    Create account
+                                </a>
+                            </li>
+                        </NotAuthorized>
+                    </AuthorizeView>
                 </ul>
             </div>
         </div>
@@ -140,7 +275,6 @@
                 &copy; @DateTime.Now.Year ReviewDeck.
                 All rights reserved.
             </p>
-
             <p class="footer-tagline">
                 Built for your next opportunity.
             </p>
@@ -160,6 +294,7 @@
 
 @code {
     private bool isMenuOpen;
+    private ErrorBoundary? errorBoundary;
 
     private void ToggleMenu()
     {
@@ -169,5 +304,10 @@
     private void CloseMenu()
     {
         isMenuOpen = false;
+    }
+
+    private void RecoverBoundary()
+    {
+        errorBoundary?.Recover();
     }
 }
