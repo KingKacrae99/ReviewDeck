@@ -16,6 +16,7 @@
 .sideNav h1{
   color: var(--accent2);
   font-weight: bold;
+  font-size: 1.5rem;
 }
 
 .sidebar-links { 
