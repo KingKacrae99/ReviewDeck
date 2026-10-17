@@ -333,15 +333,15 @@
             .ToList();
 
         hybridJobs = totalJobs
-            .Where(j => j.JobType == "Hybrid")
+            .Where(j => j.JobMode == "Hybrid")
             .ToList();
 
         onsiteJobs = totalJobs
-            .Where(j => j.JobType == "Onsite")
+            .Where(j => j.JobMode == "Onsite")
             .ToList();
 
         remoteJobs = totalJobs
-            .Where(j => j.JobType == "Remote")
+            .Where(j => j.JobMode == "Remote")
             .ToList();
     }
 
