@@ -75,6 +75,9 @@
     font-size: 0.8rem;
     letter-spacing: 0;
 }
+.developer-content .about-eyebrow {
+    color: var(--about-ink);
+}
 
 .about-eyebrow {
     margin-bottom: 1.25rem;
